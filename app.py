@@ -94,7 +94,7 @@ with col2:
 # CONVERT BUTTON
 # -------------------------
 
-if st.button("🚀 Convert Currency"):
+if st.button(" Convert Currency"):
 
     with st.spinner("Converting... 🔄"):
         time.sleep(1)  # animation feel
