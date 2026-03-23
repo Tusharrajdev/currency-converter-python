@@ -1,10 +1,51 @@
 import streamlit as st
 import requests
-
-st.title("💱 Currency Converter")
+import time
 
 # -------------------------
-# Full Currency List
+# PAGE CONFIG
+# -------------------------
+
+st.set_page_config(page_title="Currency Converter", page_icon="💱")
+
+# -------------------------
+# CUSTOM STYLE (ANIMATION + UI)
+# -------------------------
+
+st.markdown("""
+<style>
+.main {
+    background-color: #0e1117;
+}
+
+.big-title {
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: #00f5d4;
+}
+
+.result-box {
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #1f6f8b;
+    color: white;
+    text-align: center;
+    font-size: 22px;
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<p class="big-title">💱 Currency Converter</p>', unsafe_allow_html=True)
+
+# -------------------------
+# Currency List
 # -------------------------
 
 currencies = {
@@ -35,37 +76,50 @@ currencies = {
 currency_names = list(currencies.keys())
 
 # -------------------------
-# User Input
+# INPUT SECTION
 # -------------------------
 
-amount = st.number_input("Enter Amount", value=1.0)
+st.markdown("### 💰 Enter Amount")
+amount = st.number_input("", value=1.0)
 
-from_currency_name = st.selectbox("From Currency", currency_names)
-to_currency_name = st.selectbox("To Currency", currency_names)
+col1, col2 = st.columns(2)
+
+with col1:
+    from_currency_name = st.selectbox("From Currency", currency_names)
+
+with col2:
+    to_currency_name = st.selectbox("To Currency", currency_names)
 
 # -------------------------
-# Convert Function
+# CONVERT BUTTON
 # -------------------------
 
-if st.button("Convert"):
+if st.button("🚀 Convert Currency"):
 
-    fc = currencies[from_currency_name]
-    tc = currencies[to_currency_name]
+    with st.spinner("Converting... 🔄"):
+        time.sleep(1)  # animation feel
 
-    url = f"https://api.exchangerate-api.com/v4/latest/{fc}"
-    data = requests.get(url).json()
+        fc = currencies[from_currency_name]
+        tc = currencies[to_currency_name]
 
-    rate = data["rates"][tc]
-    result = amount * rate
+        url = f"https://api.exchangerate-api.com/v4/latest/{fc}"
+        data = requests.get(url).json()
 
-    # 💡 Today's rate
+        rate = data["rates"][tc]
+        result = amount * rate
+
+        fee = result * 0.02
+        final = result - fee
+
+    # -------------------------
+    # OUTPUT
+    # -------------------------
+
     st.info(f"💡 1 {fc} = {rate:.2f} {tc}")
-
-    # 💳 Fee
-    fee = result * 0.02
-    final = result - fee
 
     st.warning(f"💳 Fee: {fee:.2f} | Final: {final:.2f} {tc}")
 
-    # ✅ Result
-    st.success(f"{amount} {fc} = {result:.2f} {tc}")
+    st.markdown(
+        f'<div class="result-box">{amount} {fc} = {result:.2f} {tc}</div>',
+        unsafe_allow_html=True
+    )
